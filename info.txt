@@ -1,0 +1,12 @@
+
+func featre_selection
+    loop methods 
+    return list of lables
+    save to a df
+    save to file 
+
+pre process df => 
+    result of up featre_selection
+
+
+
