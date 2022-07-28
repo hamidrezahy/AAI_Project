@@ -1,0 +1,12 @@
+{
+  "Z-Alizadeh-Data_path": "./data/Z-Alizadeh sani dataset.xlsx",
+  "UCI-Data_path": "./Data/heart.csv",
+  "hidden_units" : [12, 12, 12, 12],
+  "num_epochs" : 14,
+  "batch_size": 10,
+  "train_size": 0.85,
+  "train_sample_size" : 0.3,
+  "counter": 1,
+  "random_seed":10,
+  "n_obs": 46
+}
