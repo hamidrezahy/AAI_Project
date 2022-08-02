@@ -1,0 +1,8 @@
+{
+  "datapath": "data/Z-Alizadeh sani dataset_preprocessed.xlsx",
+  "test_size": 0.33,
+  "random_state": 42,
+  "label": "Cath",
+  "test_num": 100,
+  "models_list": ["RF","GNB","ADB","ET","GB","MLP","XGB","LR"]
+}
