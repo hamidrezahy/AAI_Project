@@ -1,15 +1,15 @@
+from datetime import datetime
 import os
-import src.MOBE_Main as MOBE_Main
-import src.experiments as exp
 
-HP= exp.create_experiments()
+def create_experiments():
+  today = datetime.now()
 
-heart= MOBE_Main.MOBE('./Config/main_config.json')
-
-heart.Classic_Classifiers(HP)       #Run Classic Methods
-
-heart.MCD_Classifier(HP)        #Run Monte Carlo Dropout Model
-
-heart.BNN_Classifier(HP)        #Run BNN Model
-
-heart.MOE_Classifier(HP)        #Run Proposed Model
+  if today.hour < 12:
+    h = "00"
+  else:
+    h = "12"
+  path= "./experiments/" + today.strftime('%Y%m%d')+ h
+  if not os.path.exists(path):
+    os.makedirs(path)
+    print("Create experiments Dir : {}!".format(path))
+  return path

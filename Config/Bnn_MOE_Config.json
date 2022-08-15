@@ -1,6 +1,11 @@
 {
   "Z-Alizadeh-Data_path": "./data/Z-Alizadeh sani dataset.xlsx",
   "UCI-Data_path": "./Data/heart.csv",
+  "datapath_processed": "data/Z-Alizadeh sani dataset_preprocessed.xlsx",
+  "datapath_rowdata": "data/Z-Alizadeh sani dataset_rowdata.xlsx",
+  "datapath_RFECV": "data/RFECV_fs_dataset.xlsx",
+  "datapath_XGB": "data/XGB_fs_dataset.xlsx",
+  "bigdatapath_processed": "data/big_data_Pre_Processed.xlsx",
   "hidden_units" : [12, 12, 12, 12],
   "num_epochs" : 14,
   "batch_size": 10,
@@ -8,5 +13,9 @@
   "train_sample_size" : 0.3,
   "counter": 1,
   "random_seed":10,
-  "n_obs": 46
+  "n_obs": 46,
+  "random_state": 42,
+  "label": "Cath",
+  "test_size": 0.33,
+  "models_list": ["RF","ET","MLP","LR"]
 }
