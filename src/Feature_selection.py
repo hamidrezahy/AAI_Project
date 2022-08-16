@@ -104,10 +104,12 @@ class feature_selection:
                 selected_x_data.to_excel(self.experience_path+'/'+i+'_fs_dataset.xlsx', index=False)
                 self.report(i)
 
-
+        print("Hi")
         fdf = pd.DataFrame.from_dict(self.features, orient='index').transpose()
         fdf.to_excel(self.experience_path+'/feature_selection_RES.xlsx', index=False)
-        self.check= self.res_dic
+        fdf = pd.DataFrame.from_dict(self.res_dic, orient='index').transpose()
+        fdf.to_excel(self.experience_path + '/feature_selection_RES_kvalue.xlsx', index=False)
+        #self.check= self.res_dic
 
 
     def eval_(self, X, y, name):
