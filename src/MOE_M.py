@@ -26,13 +26,16 @@ from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.layers import Dropout, BatchNormalization
 np.set_printoptions(precision=3, suppress=True)
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
 
 tfd = tfp.distributions
 
 class moe:
     def __init__(self, parameters, HP, dataset_name):
         self.datapath = parameters[dataset_name]
-        self.resname= dataset_name
+        self.resname= dataset_name+'_BNN_moe'
         self.test_size = parameters['test_size']
         self.label = parameters['label']
         self.random_state = parameters['random_state']
@@ -220,7 +223,7 @@ class moe:
                 units=units,
                 make_prior_fn= self.prior_mean_field,
                 make_posterior_fn= self.posterior_mean_field,
-                kl_weight=1 / self.moe_Inputs['LR'][0].shape[0],
+                kl_weight=1 / 31,
                 activation='tanh',
             )(features)
             # features = layers.Dense(units=20, activation='sigmoid')(features)
@@ -231,10 +234,10 @@ class moe:
 
         # features = layers.Dense(tfp.layers.MultivariateNormalTriL.params_size(1), activation=None)(features)
         # features = tfp.layers.MultivariateNormalTriL(1, activity_regularizer=tfp.layers.KLDivergenceRegularizer(prior, weight=1/10))(features)
-        
-        features = layers.Dense(units=1)(features)
-        ##features= tf.keras.layers.Dense(tfp.layers.IndependentBernoulli.params_size(1))(features)
-        ##features= tfp.layers.IndependentBernoulli(1, tfd.Bernoulli.logits)(features)
+        ##features = layers.Dense(units=1, activation='sigmoid')(features)
+        features = layers.Dense(units=2)(features)
+        features= tf.keras.layers.Dense(1)(features)
+        features= tfp.layers.IndependentBernoulli(1)(features)
         # features = layers.Dense(units=1, activation= 'softmax')(features)
         #features = layers.Dense(tfp.layers.IndependentBernoulli.params_size(1)(features))
         #features = tfp.layers.IndependentBernoulli(1)(features)
@@ -244,7 +247,7 @@ class moe:
         model = keras.Model(inputs=[InData_Ex1, InData_Ex2, InData_Ex3, InData_Ex4, InData_Ex5], outputs=features)
         model.compile(
             optimizer= keras.optimizers.Adam(learning_rate=0.001),
-            loss= "binary_crossentropy",
+            loss= neg_log_likelihood,
             metrics=['accuracy'])
         print(model.summary())
         # history = model.fit([self.moe_Inputs['RF'][0],
@@ -270,29 +273,44 @@ class moe:
                                     self.moe_Inputs['LR'][0],
                                     self.X_train],
                                     self.y_train,
-                                    epochs=100,
+                                    epochs=1000,
                                     validation_data=([self.moe_Inputs['RF'][1],
                                                       self.moe_Inputs['ET'][1],
                                                       self.moe_Inputs['MLP'][1],
                                                       self.moe_Inputs['LR'][1],
                                                       self.X_test],
                                                       self.y_test),
-                                                      batch_size=10)
-        predicted= self.moe_model.predict([self.moe_Inputs['RF'][1],
-                                           self.moe_Inputs['ET'][1],
-                                           self.moe_Inputs['MLP'][1],
-                                           self.moe_Inputs['LR'][1],
-                                           self.X_test])
-        final_result= []
-        for i in  predicted:
-          if i>=0.5:
-            final_result.append(1)
-          else:
-            final_result.append(0)
-        acc_= accuracy_score(self.y_test, final_result)
+                                                      batch_size=64)
 
-        print(acc_)
-        print(predicted)
+        # final_result= []
+        # for i in  predicted:
+        #   if i>=0.5:
+        #     final_result.append(1)
+        #   else:
+        #     final_result.append(0)
+        acc_=[]
+        precision_=[]
+        recall_=[]
+        f1_=[]
+        res_dic = {}
+        for i in range(100):
+          predicted= self.moe_model.predict([self.moe_Inputs['RF'][1],
+                                            self.moe_Inputs['ET'][1],
+                                            self.moe_Inputs['MLP'][1],
+                                            self.moe_Inputs['LR'][1],
+                                            self.X_test])
+          acc_.append(accuracy_score(self.y_test, predicted))
+          precision_.append(precision_score(self.y_test, predicted))
+          recall_.append(recall_score(self.y_test, predicted))
+          f1_.append(f1_score(self.y_test, predicted))
+        res_dic["acc"]= [str(np.mean(acc_))[:4]+' ± '+ str(np.std(acc_))[:4]]  
+        res_dic["precision"]= [str(np.mean(precision_))[:4]+' ± '+ str(np.std(acc_))[:4]]
+        res_dic["recall"]= [str(np.mean(recall_))[:4]+' ± '+ str(np.std(acc_))[:4]]
+        res_dic["f1"]= [str(np.mean(f1_))[:4]+' ± '+ str(np.std(acc_))[:4]]
+        resdf = pd.DataFrame(res_dic)
+        resdf.to_excel(self.experience_path+'/'+self.resname+'.xlsx')
+
+        # print(predicted)
         # for i in range(100):
         #   predicted= self.moe_model.predict([self.moe_Inputs['RF'][1],
         #                                      self.moe_Inputs['ET'][1],
